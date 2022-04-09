@@ -107,7 +107,7 @@ Resources:
       GatewayId: !Ref InternetGateWay
       RouteTableId: !Ref PublicRouteTable
 
-  WebInstance:
+  WebInstanceA:
     Type: AWS::EC2::Instance
     Properties:
       BlockDeviceMappings:
@@ -125,19 +125,39 @@ Resources:
       SubnetId: !Ref PublicSubnet
       Tags:
         - Key: Name
-          Value: JenkInstance 
+          Value: ProjectInstance01
+
+  WebInstanceB:
+    Type: AWS::EC2::Instance
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp3
+            Iops: 3000
+            DeleteOnTermination: true
+            VolumeSize: 8
+      ImageId: ami-03e88be9ecff64781
+      InstanceType: t2.micro
+      KeyName: cba-web-Key
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: ProjectInstance02    
       UserData:
         Fn::Base64:
-          #!/bin/bash
-          sudo su
-          yum update -y
-          yum install java-1.8.0-openjdk-devel -y
-          curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo | tee /etc/yum.repos.d/jenkins.repo
-          rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
-          systemctl daemon-reload
-          amazon-linux-extras install epel -y
-          yum install jenkins -y
-          systemctl start jenkins
-          systemctl status jenkins
-          systemctl enable jenkins
-          cat /var/lib/jenkins/secrets/initialAdminPassword
+          !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install java-1.8.0-openjdk-devel -y
+            curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo | tee /etc/yum.repos.d/jenkins.repo
+            rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+            systemctl daemon-reload
+            amazon-linux-extras install epel -y
+            yum install jenkins -y
+            systemctl start jenkins
+            systemctl status jenkins
+            systemctl enable jenkins
+            cat /var/lib/jenkins/secrets/initialAdminPassword

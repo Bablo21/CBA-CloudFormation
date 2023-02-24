@@ -2,4 +2,4 @@
 All CloudFormation templates for CloudBoosta Training Cohort 1
 
 
-testing Jenkins
+testing Jenk
